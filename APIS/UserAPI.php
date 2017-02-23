@@ -19,8 +19,8 @@ class UserAPI
             case 'GET':
                 $this->getUsers();
                 break;
-            case 'POST'://inserta
-                echo 'POST';
+            case 'POST':
+                $this->createUser();
                 break;
             case 'PUT'://actualiza
                 echo 'PUT';
@@ -53,7 +53,7 @@ class UserAPI
         }
     }
 
-    function createUser()
+    private function createUser()
     {
         if ($_GET['action'] == 'peoples') {
             //Decodifica un string de JSON
@@ -82,7 +82,7 @@ class UserAPI
         }
     }
 
-    function response($code = 200, $status = "", $message = "")
+    private function response($code = 200, $status = "", $message = "")
     {
         http_response_code($code);
         if (!empty($status) && !empty($message)) {
