@@ -1,6 +1,6 @@
 <?php
 
-require '../DatabaseConnection/Database.php';
+require_once '../DatabaseConnection/Database.php';
 
 class User
 {

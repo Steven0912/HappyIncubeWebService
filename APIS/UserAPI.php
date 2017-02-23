@@ -7,7 +7,7 @@
  * Time: 3:19 PM
  */
 
-require '../Models/User.php';
+require_once '../Models/User.php';
 
 class UserAPI
 {
