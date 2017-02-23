@@ -62,9 +62,18 @@ class UserAPI
             if (empty((array)$obj)) {
                 $this->response(422, "error", "Nada para añadir, revisa los datos");
             } else if ($obj) {
-                $people = new PeopleDB();
-                $people->insert($obj->name);
-                $this->response(200, "success", "new record added");
+                $user = new User();
+                $user->create(
+                    $obj['identification'],
+                    $obj['firstName'],
+                    $obj['lastName'],
+                    $obj['email'],
+                    $obj['mobile'],
+                    $obj['password'],
+                    $obj['state'],
+                    $obj['rol']
+                );
+                $this->response(200, "success", "Nuevo usuario añadido");
             } else {
                 $this->response(422, "error", "Esta propiedad no esta definida");
             }

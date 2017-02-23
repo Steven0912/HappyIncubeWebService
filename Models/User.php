@@ -10,33 +10,33 @@ class User
 
     public static function getUsers()
     {
-        $consulta = "SELECT * FROM users";
+        $query = "SELECT * FROM users";
         try {
             // Preparar sentencia
-            $comando = Database::getInstance()->getDb()->prepare($consulta);
+            $command = Database::getInstance()->getDb()->prepare($query);
             // Ejecutar sentencia preparada
-            $comando->execute();
+            $command->execute();
 
-            return $comando->fetchAll(PDO::FETCH_ASSOC);
+            return $command->fetchAll(PDO::FETCH_ASSOC);
 
         } catch (PDOException $e) {
             return false;
         }
     }
 
-    public static function getUser($idUser)
+    public static function getUser($id)
     {
         // Consulta de la meta
-        $consulta = "SELECT * FROM users
+        $query = "SELECT * FROM users
                              WHERE id = ?";
 
         try {
             // Preparar sentencia
-            $comando = Database::getInstance()->getDb()->prepare($consulta);
+            $command = Database::getInstance()->getDb()->prepare($query);
             // Ejecutar sentencia preparada
-            $comando->execute(array($idUser));
+            $command->execute(array($id));
             // Capturar primera fila del resultado
-            $row = $comando->fetch(PDO::FETCH_ASSOC);
+            $row = $command->fetch(PDO::FETCH_ASSOC);
             return $row;
 
         } catch (PDOException $e) {
@@ -46,18 +46,18 @@ class User
         }
     }
 
-    public static function checkLogin($name, $password)
+    public static function checkLogin($firstName, $password)
     {
         // Consulta de la meta
-        $consulta = "SELECT * FROM users
+        $query = "SELECT * FROM users
                              WHERE fisrtName = ? and password = ?";
 
         try {
-            $comando = Database::getInstance()->getDb()->prepare($consulta);
+            $command = Database::getInstance()->getDb()->prepare($query);
 
-            $comando->execute(array($name, $password));
+            $command->execute(array($firstName, $password));
 
-            $row = $comando->fetch(PDO::FETCH_ASSOC);
+            $row = $command->fetch(PDO::FETCH_ASSOC);
 
             return $row;
 
@@ -91,32 +91,41 @@ class User
 
 
     public static function create(
-        $titulo,
-        $descripcion,
-        $fechaLim,
-        $categoria,
-        $prioridad
+        $identification,
+        $firstName,
+        $lastName,
+        $email,
+        $mobile,
+        $password,
+        $state = 1,
+        $rol
     )
     {
         // Sentencia INSERT
-        $comando = "INSERT INTO meta ( " .
-            "titulo," .
-            " descripcion," .
-            " fechaLim," .
-            " categoria," .
-            " prioridad)" .
-            " VALUES( ?,?,?,?,?)";
+        $comando = "INSERT INTO users ( " .
+            " identification," .
+            " firstName," .
+            " lastName," .
+            " email," .
+            " mobile," .
+            " password," .
+            " States_id," .
+            " Roles_id)" .
+            " VALUES( ?,?,?,?,?,?,?,? )";
 
         // Preparar la sentencia
         $sentencia = Database::getInstance()->getDb()->prepare($comando);
 
         return $sentencia->execute(
             array(
-                $titulo,
-                $descripcion,
-                $fechaLim,
-                $categoria,
-                $prioridad
+                $identification,
+                $firstName,
+                $lastName,
+                $email,
+                $mobile,
+                $password,
+                $state,
+                $rol
             )
         );
 
