@@ -1,13 +1,6 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: DESARROLLO HAPPY INC
- * Date: 23/02/2017
- * Time: 3:19 PM
- */
-
-require_once '../Models/User.php';
+require_once '../Models/AccessPoint.php';
 
 class UserAPI
 {
@@ -36,17 +29,16 @@ class UserAPI
 
     private function getUsers()
     {
-        $db = new User();
         if ($_GET['action'] == 'users') {
             if (isset($_GET['id'])) {//muestra 1 solo registro si es que existiera ID
-                $response = $db->getUser($_GET['id']);
+                $response = User::getUser($_GET['id']);
                 echo json_encode($response, JSON_PRETTY_PRINT);
             } else { //muestra todos los registros
-                $response = $db->getUsers();
+                $response = User::getUsers();
                 echo json_encode($response, JSON_PRETTY_PRINT);
             }
         } else if ($_GET['action'] == 'checkLogin') {
-            $response = $db->checkLogin($_GET['name'], $_GET['password']);
+            $response = User::checkLogin($_GET['name'], $_GET['password']);
             echo json_encode($response, JSON_PRETTY_PRINT);
         } else {
             $this->response(400);
@@ -62,8 +54,7 @@ class UserAPI
             if (empty((array)$obj)) {
                 $this->response(422, "error", "Nada para añadir, revisa los datos");
             } else if ($obj) {
-                $user = new User();
-                $user->create(
+                User::create(
                     $obj['identification'],
                     $obj['firstName'],
                     $obj['lastName'],

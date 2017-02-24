@@ -10,7 +10,7 @@ class User
 
     public static function getUsers()
     {
-        $query = "SELECT * FROM users";
+        /*$query = "SELECT * FROM users";
         try {
             // Preparar sentencia
             $command = Database::getInstance()->getDb()->prepare($query);
@@ -21,7 +21,9 @@ class User
 
         } catch (PDOException $e) {
             return false;
-        }
+        }*/
+
+        return "hola";
     }
 
     public static function getUser($id)
