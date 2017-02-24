@@ -1,6 +1,6 @@
 <?php
 
-require_once '../DatabaseConnection/Database.php';
+require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '../DatabaseConnection/Database.php';
 
 class User
 {
@@ -10,7 +10,7 @@ class User
 
     public static function getUsers()
     {
-        /*$query = "SELECT * FROM users";
+        $query = "SELECT * FROM users";
         try {
             // Preparar sentencia
             $command = Database::getInstance()->getDb()->prepare($query);
@@ -21,9 +21,7 @@ class User
 
         } catch (PDOException $e) {
             return false;
-        }*/
-
-        return "hola";
+        }
     }
 
     public static function getUser($id)
@@ -48,11 +46,106 @@ class User
         }
     }
 
+    public static function create(
+        $identification,
+        $firstName,
+        $lastName,
+        $email,
+        $mobile,
+        $password,
+        $state = 1,
+        $rol
+    )
+    {
+        // Sentencia INSERT
+        $query = "INSERT INTO users ( " .
+            " identification," .
+            " firstName," .
+            " lastName," .
+            " email," .
+            " mobile," .
+            " password," .
+            " States_id," .
+            " Roles_id)" .
+            " VALUES( ?,?,?,?,?,?,?,? )";
+
+        try {
+            // Preparar la sentencia
+            $command = Database::getInstance()->getDb()->prepare($query);
+
+            return $command->execute(
+                array(
+                    $identification,
+                    $firstName,
+                    $lastName,
+                    $email,
+                    $mobile,
+                    $password,
+                    $state,
+                    $rol
+                )
+            );
+
+        } catch (PDOException $e) {
+            return -1;
+        }
+
+    }
+
+    public static function update(
+        $identification,
+        $firstName,
+        $lastName,
+        $email,
+        $mobile,
+        $password,
+        $state,
+        $rol,
+        $id
+    )
+    {
+        // Creando consulta UPDATE
+        $query = "UPDATE users" .
+            " SET identification=?, firstName=?, lastName=?, email=?, mobile=?, password=?, States_id=?, Roles_id=? " .
+            "WHERE id=?";
+
+        try {
+            // Preparar la sentencia
+            $command = Database::getInstance()->getDb()->prepare($query);
+
+            // Relacionar y ejecutar la sentencia
+            $command->execute(array($identification, $firstName, $lastName, $email, $mobile, $password, $state, $rol, $id));
+
+            return $command;
+
+        } catch (PDOException $e) {
+            return -1;
+        }
+    }
+
+    public static function delete($id)
+    {
+        // Sentencia DELETE
+        $query = "DELETE FROM users WHERE id=?";
+
+        try {
+            // Preparar la sentencia
+            $command = Database::getInstance()->getDb()->prepare($query);
+
+            $command->execute(array($id));
+
+            return $command;
+
+        } catch (PDOException $e) {
+            return -1;
+        }
+    }
+
     public static function checkLogin($firstName, $password)
     {
         // Consulta de la meta
         $query = "SELECT * FROM users
-                             WHERE fisrtName = ? and password = ?";
+                             WHERE firstName = ? and password = ?";
 
         try {
             $command = Database::getInstance()->getDb()->prepare($query);
@@ -66,88 +159,6 @@ class User
         } catch (PDOException $e) {
             return -1;
         }
-    }
-
-    public static function update(
-        $idUser,
-        $titulo,
-        $descripcion,
-        $fechaLim,
-        $categoria,
-        $prioridad
-    )
-    {
-        // Creando consulta UPDATE
-        $consulta = "UPDATE meta" .
-            " SET titulo=?, descripcion=?, fechaLim=?, categoria=?, prioridad=? " .
-            "WHERE idMeta=?";
-
-        // Preparar la sentencia
-        $cmd = Database::getInstance()->getDb()->prepare($consulta);
-
-        // Relacionar y ejecutar la sentencia
-        $cmd->execute(array($titulo, $descripcion, $fechaLim, $categoria, $prioridad, $idMeta));
-
-        return $cmd;
-    }
-
-
-    public static function create(
-        $identification,
-        $firstName,
-        $lastName,
-        $email,
-        $mobile,
-        $password,
-        $state = 1,
-        $rol
-    )
-    {
-        // Sentencia INSERT
-        $comando = "INSERT INTO users ( " .
-            " identification," .
-            " firstName," .
-            " lastName," .
-            " email," .
-            " mobile," .
-            " password," .
-            " States_id," .
-            " Roles_id)" .
-            " VALUES( ?,?,?,?,?,?,?,? )";
-
-        // Preparar la sentencia
-        $sentencia = Database::getInstance()->getDb()->prepare($comando);
-
-        return $sentencia->execute(
-            array(
-                $identification,
-                $firstName,
-                $lastName,
-                $email,
-                $mobile,
-                $password,
-                $state,
-                $rol
-            )
-        );
-
-    }
-
-    /**
-     * Eliminar el registro con el identificador especificado
-     *
-     * @param $idMeta identificador de la meta
-     * @return bool Respuesta de la eliminación
-     */
-    public static function delete($idMeta)
-    {
-        // Sentencia DELETE
-        $comando = "DELETE FROM meta WHERE idMeta=?";
-
-        // Preparar la sentencia
-        $sentencia = Database::getInstance()->getDb()->prepare($comando);
-
-        return $sentencia->execute(array($idMeta));
     }
 }
 

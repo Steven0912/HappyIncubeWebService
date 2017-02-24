@@ -8,5 +8,10 @@
 
 
 require_once "APIS/UserAPI.php";
-$userAPI = new UserAPI();
-$userAPI->API();
+require_once "APIS/AccessPointAPI.php";
+
+/*$userAPI = new UserAPI();
+$userAPI->API();*/
+
+$accesspointAPI = new AccessPointAPI();
+$accesspointAPI->API();
