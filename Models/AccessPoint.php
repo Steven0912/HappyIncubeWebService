@@ -29,11 +29,11 @@ class AccessPoint
                 $datas = $command->fetch(PDO::FETCH_ASSOC);
             }*/
 
+            $datas = "";
             foreach ($ids as $clave => $valor) {
                 foreach ($valor as $k => $v) {
                     $command->execute(array($v));
-                    $datas = $command->fetch(PDO::FETCH_ASSOC);
-
+                    $datas[] = $command->fetch(PDO::FETCH_ASSOC);
                 }
             }
 
