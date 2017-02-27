@@ -29,11 +29,16 @@ class AccessPoint
                 $datas = $command->fetch(PDO::FETCH_ASSOC);
             }*/
 
+            //return $ids;
             $datas = "";
             foreach ($ids as $clave => $valor) {
+                //return $valor;
                 foreach ($valor as $k => $v) {
-                    $command->execute(array($v));
-                    $datas[] = $command->fetch(PDO::FETCH_ASSOC);
+                    if ($k == "AccessPoints_id") {
+                        //$datas[] = $k;
+                        $command->execute(array($v));
+                        $datas[] = $command->fetch(PDO::FETCH_ASSOC);
+                    }
                 }
             }
 
@@ -42,16 +47,6 @@ class AccessPoint
         } catch (PDOException $e) {
             return -1;
         }
-    }
-
-    private function buildCollection($datas)
-    {
-        $this->collection = array($datas);
-    }
-
-    private function getBuildCollection()
-    {
-        return $this->collection;
     }
 
     private function getIdsAccessPoints($User_id)
