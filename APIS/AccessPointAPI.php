@@ -31,7 +31,16 @@ class AccessPointAPI
     {
         if ($_GET['action'] == 'accesspoints' && isset($_GET['id'])) {
             $response = AccessPoint::getAccessPoints($_GET['id']);
-            echo json_encode($response, JSON_PRETTY_PRINT);
+            if ($response) {
+                $accesspoints["state"] = 1;
+                $accesspoints["accesspoints"] = $response;
+                echo json_encode($accesspoints, JSON_PRETTY_PRINT);
+            } else {
+                echo json_encode(array(
+                    'state' => '2',
+                    'message' => 'No tienes puntos de acceso asignados'
+                ), JSON_PRETTY_PRINT);
+            }
         } else {
             $this->response(400);
         }
