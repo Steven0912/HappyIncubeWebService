@@ -149,7 +149,7 @@ class User
     {
         // Consulta de la meta
         $query = "SELECT * FROM users
-                             WHERE firstName = ? and password = ?";
+                             WHERE nickName = ? and password = ?";
 
         try {
             $command = Database::getInstance()->getDb()->prepare($query);

@@ -76,7 +76,7 @@ class UserAPI
             } else {
                 $this->response(422, "error", "Alguna propiedad no esta definida o es incorrecta");
             }
-        } else if ($_GET['action'] == 'checkLogin' && isset($obj['nickName']) && isset($obj['password'])) {
+        } else if ($_GET['action'] == 'checkLogin') {
             //Decodifica un string de JSON
             $obj = json_decode(file_get_contents('php://input'), true);
 
@@ -87,7 +87,16 @@ class UserAPI
                 isset($obj['password'])
             ) {
                 $response = User::checkLogin($obj['nickName'], $obj['password']);
-                echo json_encode($response, JSON_PRETTY_PRINT);
+                if ($response) {
+                    $user["state"] = 1;
+                    $user["user"] = $response;
+                    echo json_encode($user, JSON_PRETTY_PRINT);
+                } else {
+                    echo json_encode(array(
+                        'state' => '2',
+                        'message' => 'Usuario o Contraseña incorrectos'
+                    ), JSON_PRETTY_PRINT);
+                }
             } else {
                 $this->response(422, "error", "Alguna propiedad no esta definida o es incorrecta");
             }
