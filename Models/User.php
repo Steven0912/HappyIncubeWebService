@@ -50,6 +50,7 @@ class User
         $identification,
         $firstName,
         $lastName,
+        $nickName,
         $email,
         $mobile,
         $password,
@@ -62,6 +63,7 @@ class User
             " identification," .
             " firstName," .
             " lastName," .
+            " nickName," .
             " email," .
             " mobile," .
             " password," .
@@ -78,6 +80,7 @@ class User
                     $identification,
                     $firstName,
                     $lastName,
+                    $nickName,
                     $email,
                     $mobile,
                     $password,
@@ -96,6 +99,7 @@ class User
         $identification,
         $firstName,
         $lastName,
+        $nickName,
         $email,
         $mobile,
         $password,
@@ -106,7 +110,7 @@ class User
     {
         // Creando consulta UPDATE
         $query = "UPDATE users" .
-            " SET identification=?, firstName=?, lastName=?, email=?, mobile=?, password=?, States_id=?, Roles_id=? " .
+            " SET identification=?, firstName=?, lastName=?, nickName=?, email=?, mobile=?, password=?, States_id=?, Roles_id=? " .
             "WHERE id=?";
 
         try {
@@ -114,7 +118,7 @@ class User
             $command = Database::getInstance()->getDb()->prepare($query);
 
             // Relacionar y ejecutar la sentencia
-            $command->execute(array($identification, $firstName, $lastName, $email, $mobile, $password, $state, $rol, $id));
+            $command->execute(array($identification, $firstName, $lastName, $nickName, $email, $mobile, $password, $state, $rol, $id));
 
             return $command;
 
@@ -141,7 +145,7 @@ class User
         }
     }
 
-    public static function checkLogin($firstName, $password)
+    public static function checkLogin($nickName, $password)
     {
         // Consulta de la meta
         $query = "SELECT * FROM users
@@ -150,7 +154,7 @@ class User
         try {
             $command = Database::getInstance()->getDb()->prepare($query);
 
-            $command->execute(array($firstName, $password));
+            $command->execute(array($nickName, $password));
 
             $row = $command->fetch(PDO::FETCH_ASSOC);
 

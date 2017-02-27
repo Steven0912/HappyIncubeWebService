@@ -54,6 +54,7 @@ class UserAPI
                 isset($obj['identification']) &&
                 isset($obj['firstName']) &&
                 isset($obj['lastName']) &&
+                isset($obj['nickName']) &&
                 isset($obj['email']) &&
                 isset($obj['mobile']) &&
                 isset($obj['password']) &&
@@ -64,6 +65,7 @@ class UserAPI
                     $obj['identification'],
                     $obj['firstName'],
                     $obj['lastName'],
+                    $obj['nickName'],
                     $obj['email'],
                     $obj['mobile'],
                     $obj['password'],
@@ -74,17 +76,17 @@ class UserAPI
             } else {
                 $this->response(422, "error", "Alguna propiedad no esta definida o es incorrecta");
             }
-        } else if ($_GET['action'] == 'checkLogin') {
+        } else if ($_GET['action'] == 'checkLogin' && isset($obj['nickName']) && isset($obj['password'])) {
             //Decodifica un string de JSON
             $obj = json_decode(file_get_contents('php://input'), true);
 
             if (empty((array)$obj)) {
                 $this->response(422, "error", "Nada para añadir, revisa los datos");
             } else if (
-                isset($obj['firstName']) &&
+                isset($obj['nickName']) &&
                 isset($obj['password'])
             ) {
-                $response = User::checkLogin($obj['firstName'], $obj['password']);
+                $response = User::checkLogin($obj['nickName'], $obj['password']);
                 echo json_encode($response, JSON_PRETTY_PRINT);
             } else {
                 $this->response(422, "error", "Alguna propiedad no esta definida o es incorrecta");
@@ -106,6 +108,7 @@ class UserAPI
                     isset($obj['identification']) &&
                     isset($obj['firstName']) &&
                     isset($obj['lastName']) &&
+                    isset($obj['nickName']) &&
                     isset($obj['email']) &&
                     isset($obj['mobile']) &&
                     isset($obj['password']) &&
@@ -116,6 +119,7 @@ class UserAPI
                         $obj['identification'],
                         $obj['firstName'],
                         $obj['lastName'],
+                        $obj['nickName'],
                         $obj['email'],
                         $obj['mobile'],
                         $obj['password'],
@@ -138,7 +142,7 @@ class UserAPI
         if (isset($_GET['action']) && isset($_GET['id'])) {
             if ($_GET['action'] == 'users') {
                 $response = User::delete($_GET['id']);
-                if ((int) $response == -1) {
+                if ((int)$response == -1) {
                     $this->response(422, "error", "Error al eliminar el Usuario");
                     exit;
                 }
