@@ -6,7 +6,6 @@
  * Time: 4:48 PM
  */
 
-
 require_once "APIS/UserAPI.php";
 require_once "APIS/AccessPointAPI.php";
 

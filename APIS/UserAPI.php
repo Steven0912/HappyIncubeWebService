@@ -30,15 +30,23 @@ class UserAPI
     private function getUsers()
     {
         if ($_GET['action'] == 'users') {
+
             if (isset($_GET['id'])) {//muestra 1 solo registro si es que existiera ID
                 $response = User::getUser($_GET['id']);
                 echo json_encode($response, JSON_PRETTY_PRINT);
             } else { //muestra todos los registros
                 $response = User::getUsers();
-                echo json_encode($response, JSON_PRETTY_PRINT);
+                if ($response) {
+                    echo json_encode($response, JSON_PRETTY_PRINT);
+                } else {
+                    echo json_encode(array(
+                        'state' => '2',
+                        'message' => 'No hay usuarios en la bd'
+                    ), JSON_PRETTY_PRINT);
+                }
             }
         } else {
-            //$this->response(400);
+            $this->response(400);
         }
     }
 

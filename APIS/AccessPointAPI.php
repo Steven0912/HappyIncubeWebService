@@ -13,9 +13,11 @@ class AccessPointAPI
                 $this->getAccessPoints();
                 break;
             case 'POST':
+               echo "POST";
                 //por definir
                 break;
             case 'PUT':
+                print "PUT";
                 //por definir
                 break;
             case 'DELETE':

@@ -55,7 +55,7 @@ class Database
             self::$pdo = new PDO(
                 'mysql:dbname=' . DATABASE .
                 ';host=' . HOSTNAME .
-                ';port:63343;',
+                ';port:;',
                 USERNAME,
                 PASSWORD,
                 array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8")
