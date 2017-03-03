@@ -10,7 +10,9 @@ class UserAPI
         $method = $_SERVER['REQUEST_METHOD'];
         switch ($method) {
             case 'GET':
-                $this->getUsers();
+                if ($_GET['action'] == 'users') {
+                    $this->getUsers();
+                }
                 break;
             case 'POST':
                 $this->createUser();

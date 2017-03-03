@@ -10,10 +10,12 @@ class AccessPointAPI
         $method = $_SERVER['REQUEST_METHOD'];
         switch ($method) {
             case 'GET':
-                $this->getAccessPoints();
+                if ($_GET['action'] == 'accesspoints' && isset($_GET['id'])) {
+                    $this->getAccessPoints();
+                }
                 break;
             case 'POST':
-               echo "POST";
+                echo "POST";
                 //por definir
                 break;
             case 'PUT':
