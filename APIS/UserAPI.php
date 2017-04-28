@@ -8,24 +8,24 @@ class UserAPI
     {
         header('Content-Type: application/JSON');
         $method = $_SERVER['REQUEST_METHOD'];
-        switch ($method) {
-            case 'GET':
-                if ($_GET['action'] == 'users') {
+        if ($_GET['action'] == 'users') {
+            switch ($method) {
+                case 'GET':
                     $this->getUsers();
-                }
-                break;
-            case 'POST':
-                $this->createUser();
-                break;
-            case 'PUT':
-                $this->updateUser();
-                break;
-            case 'DELETE':
-                $this->deleteUser();
-                break;
-            default:
-                $this->response(405);
-                break;
+                    break;
+                case 'POST':
+                    $this->createUser();
+                    break;
+                case 'PUT':
+                    $this->updateUser();
+                    break;
+                case 'DELETE':
+                    $this->deleteUser();
+                    break;
+                default:
+                    $this->response(405);
+                    break;
+            }
         }
     }
 
@@ -84,7 +84,18 @@ class UserAPI
                     $obj['rol'],
                     $obj['token']
                 );
-                $this->response(200, "success", $response);
+                if ($response == -1) {
+                    echo json_encode(array(
+                        'state' => '2',
+                        'message' => 'Hubo un error al insertar el usuario'
+                    ), JSON_PRETTY_PRINT);
+                } else {
+                    $userDate = User::getLastUser();
+
+                    $user["state"] = 1;
+                    $user["user"] = $userDate;
+                    echo json_encode($user, JSON_PRETTY_PRINT);
+                }
             } else {
                 $this->response(422, "error", "Alguna propiedad no esta definida o es incorrecta");
             }

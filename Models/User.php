@@ -46,6 +46,24 @@ class User
         }
     }
 
+    public static function getLastUser()
+    {
+        $query = "SELECT * FROM users ORDER BY id DESC LIMIT 1";
+
+        try {
+            // Preparar sentencia
+            $command = Database::getInstance()->getDb()->prepare($query);
+            // Capturar primera fila del resultado
+            $row = $command->fetch(PDO::FETCH_ASSOC);
+            return $row;
+
+        } catch (PDOException $e) {
+            // Aquí puedes clasificar el error dependiendo de la excepción
+            // para presentarlo en la respuesta Json
+            return -1;
+        }
+    }
+
     public static function getUserToken($id)
     {
         // Consulta de el token de un usuario en especifico
@@ -94,8 +112,7 @@ class User
         try {
             // Preparar la sentencia
             $command = Database::getInstance()->getDb()->prepare($query);
-
-            return $command->execute(
+            $command->execute(
                 array(
                     $identification,
                     $firstName,
@@ -109,6 +126,7 @@ class User
                     $token
                 )
             );
+            return $command;
 
         } catch (PDOException $e) {
             return -1;
