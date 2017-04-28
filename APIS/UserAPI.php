@@ -69,7 +69,8 @@ class UserAPI
                 isset($obj['mobile']) &&
                 isset($obj['password']) &&
                 isset($obj['state']) &&
-                isset($obj['rol'])
+                isset($obj['rol']) &&
+                isset($obj['token'])
             ) {
                 $response = User::create(
                     $obj['identification'],
@@ -80,7 +81,8 @@ class UserAPI
                     $obj['mobile'],
                     $obj['password'],
                     $obj['state'],
-                    $obj['rol']
+                    $obj['rol'],
+                    $obj['token']
                 );
                 $this->response(200, "success", $response);
             } else {
@@ -94,10 +96,14 @@ class UserAPI
                 $this->response(422, "error", "Nada para añadir, revisa los datos");
             } else if (
                 isset($obj['nickName']) &&
-                isset($obj['password'])
+                isset($obj['password']) &&
+                isset($obj['token'])
             ) {
                 $response = User::checkLogin($obj['nickName'], $obj['password']);
                 if ($response) {
+                    User::setUserToken($response["id"], $obj['token']);
+                    $response = User::getUser($response["id"]);
+
                     $user["state"] = 1;
                     $user["user"] = $response;
                     echo json_encode($user, JSON_PRETTY_PRINT);

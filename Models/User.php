@@ -26,7 +26,7 @@ class User
 
     public static function getUser($id)
     {
-        // Consulta de la meta
+        // Consulta de un usuario en especifico
         $query = "SELECT * FROM users
                              WHERE id = ?";
 
@@ -46,6 +46,24 @@ class User
         }
     }
 
+    public static function getUserToken($id)
+    {
+        // Consulta de el token de un usuario en especifico
+        $query = "SELECT token FROM users WHERE id = ?";
+
+        try {
+            // Preparar la sentencia
+            $command = Database::getInstance()->getDb()->prepare($query);
+            // Ejecutar la sentencia preparada
+            $command->execute(array($id));
+            // Capturar primera fila del resultado
+            $row = $command->fetch(PDO::FETCH_ASSOC);
+            return $row;
+        } catch (PDOException $e) {
+            return -1;
+        }
+    }
+
     public static function create(
         $identification,
         $firstName,
@@ -55,7 +73,8 @@ class User
         $mobile,
         $password,
         $state = 1,
-        $rol
+        $rol,
+        $token
     )
     {
         // Sentencia INSERT
@@ -68,8 +87,9 @@ class User
             " mobile," .
             " password," .
             " States_id," .
-            " Roles_id)" .
-            " VALUES( ?,?,?,?,?,?,?,? )";
+            " Roles_id," .
+            " token)" .
+            " VALUES( ?,?,?,?,?,?,?,?,?,? )";
 
         try {
             // Preparar la sentencia
@@ -85,14 +105,14 @@ class User
                     $mobile,
                     $password,
                     $state,
-                    $rol
+                    $rol,
+                    $token
                 )
             );
 
         } catch (PDOException $e) {
             return -1;
         }
-
     }
 
     public static function update(
@@ -108,7 +128,7 @@ class User
         $id
     )
     {
-        // Creando consulta UPDATE
+        // Creando query UPDATE
         $query = "UPDATE users" .
             " SET identification=?, firstName=?, lastName=?, nickName=?, email=?, mobile=?, password=?, States_id=?, Roles_id=? " .
             "WHERE id=?";
@@ -119,6 +139,27 @@ class User
 
             // Relacionar y ejecutar la sentencia
             $command->execute(array($identification, $firstName, $lastName, $nickName, $email, $mobile, $password, $state, $rol, $id));
+
+            return $command;
+
+        } catch (PDOException $e) {
+            return -1;
+        }
+    }
+
+    public static function setUserToken($id, $token)
+    {
+        // Creando query UPDATE
+        $query = "UPDATE users" .
+            " SET token=? " .
+            "WHERE id=?";
+
+        try {
+            // Preparar la sentencia
+            $command = Database::getInstance()->getDb()->prepare($query);
+
+            // Relacionar y ejecutar la sentencia
+            $command->execute(array($token, $id));
 
             return $command;
 
