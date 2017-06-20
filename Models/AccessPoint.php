@@ -10,6 +10,28 @@ class AccessPoint
     {
     }
 
+    public static function insertAccessPointsToUserDefault($idUser, $idAccessPoint)
+    {
+        // Creando query UPDATE
+        $query = "INSERT INTO assignedpoints ( " .
+            " users_id," .
+            " accessPoints_id)" .
+            " VALUES( ?,?)";
+
+        try {
+            // Preparar la sentencia
+            $command = Database::getInstance()->getDb()->prepare($query);
+
+            // Relacionar y ejecutar la sentencia
+            $command->execute(array($idUser, $idAccessPoint));
+
+            return $command;
+
+        } catch (PDOException $e) {
+            return -1;
+        }
+    }
+
     public static function getAccessPoints($User_id)
     {
         $ids = self::getIdsAccessPoints($User_id);
@@ -24,7 +46,7 @@ class AccessPoint
                 $i = 0;
                 foreach ($ids as $clave => $valor) {
                     foreach ($valor as $k => $v) {
-                        if ($k == "AccessPoints_id") {
+                        if ($k == "accesspoints_id") {
                             $command->execute(array($v));
                             $datas[] = $command->fetch(PDO::FETCH_ASSOC);
                             $datas[$i]["icon"] = base64_encode($datas[$i]["icon"]);
@@ -43,7 +65,7 @@ class AccessPoint
 
     private function getIdsAccessPoints($User_id)
     {
-        $query = "SELECT * FROM assignedpoints WHERE Users_id = ?";
+        $query = "SELECT * FROM assignedpoints WHERE users_id = ?";
         try {
             // Preparar sentencia
             $command = Database::getInstance()->getDb()->prepare($query);

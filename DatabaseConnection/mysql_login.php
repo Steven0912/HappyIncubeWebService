@@ -4,7 +4,7 @@
  * Mysql.
  */
 define("HOSTNAME", "happyhappyinc.com");// Nombre del host
-define("DATABASE", "control_access"); // Nombre de la base de datos
-define("USERNAME", "control_access"); // Nombre del usuario
-define("PASSWORD", "control_access2017"); // Nombre de la constraseña
+define("DATABASE", "bd_happy"); // Nombre de la base de datos
+define("USERNAME", "bd_happy"); // Nombre del usuario
+define("PASSWORD", "bd_happy2017*"); // Nombre de la constraseña
 ?>

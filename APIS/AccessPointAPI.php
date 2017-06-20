@@ -1,6 +1,8 @@
 <?php
 
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '../Models/AccessPoint.php';
+require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '../APIS/Security.php';
+require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '../Utils/Exceptions.php';
 
 class AccessPointAPI
 {
@@ -8,26 +10,31 @@ class AccessPointAPI
     {
         header('Content-Type: application/JSON');
         $method = $_SERVER['REQUEST_METHOD'];
-        switch ($method) {
-            case 'GET':
-                if ($_GET['action'] == 'accesspoints' && isset($_GET['id'])) {
-                    $this->getAccessPoints();
-                }
-                break;
-            case 'POST':
-                echo "POST";
-                //por definir
-                break;
-            case 'PUT':
-                print "PUT";
-                //por definir
-                break;
-            case 'DELETE':
-                //por definir
-                break;
-            default:
-                //por definir
-                break;
+
+        $obj = new Security();
+        if ($obj->autorizar() == 10) {
+
+            switch ($method) {
+                case 'GET':
+                    if ($_GET['action'] == 'accesspoints' && isset($_GET['id'])) {
+                        $this->getAccessPoints();
+                    }
+                    break;
+                case 'POST':
+                    echo "POST";
+                    //por definir
+                    break;
+                case 'PUT':
+                    print "PUT";
+                    //por definir
+                    break;
+                case 'DELETE':
+                    //por definir
+                    break;
+                default:
+                    //por definir
+                    break;
+            }
         }
     }
 
@@ -46,16 +53,8 @@ class AccessPointAPI
                 ), JSON_PRETTY_PRINT);
             }
         } else {
-            $this->response(400);
-        }
-    }
-
-    private function response($code = 200, $status = "", $message = "")
-    {
-        http_response_code($code);
-        if (!empty($status) && !empty($message)) {
-            $response = array("status" => $status, "message" => $message);
-            echo json_encode($response, JSON_PRETTY_PRINT);
+            new Exceptions(400);
+            //$this->response(400);
         }
     }
 }

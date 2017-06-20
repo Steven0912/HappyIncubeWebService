@@ -1,6 +1,10 @@
 <?php
 
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '../Models/User.php';
+require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '../Models/AccessPoint.php';
+require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '../APIS/Security.php';
+require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '../Utils/Exceptions.php';
+error_reporting(0);
 
 class UserAPI
 {
@@ -8,13 +12,19 @@ class UserAPI
     {
         header('Content-Type: application/JSON');
         $method = $_SERVER['REQUEST_METHOD'];
-        if ($_GET['action'] == 'users') {
+
+        $obj = new Security();
+        if ($obj->autorizar() == 10) {
+
             switch ($method) {
                 case 'GET':
-                    $this->getUsers();
+                    if ($_GET['action'] == 'users') {
+                        $this->getUsers();
+                    }
                     break;
                 case 'POST':
                     $this->createUser();
+
                     break;
                 case 'PUT':
                     $this->updateUser();
@@ -23,13 +33,16 @@ class UserAPI
                     $this->deleteUser();
                     break;
                 default:
-                    $this->response(405);
+                    new Exceptions(405);
+                    //$this->response(405);
+
                     break;
             }
         }
     }
 
-    private function getUsers()
+    private
+    function getUsers()
     {
         if ($_GET['action'] == 'users') {
 
@@ -48,87 +61,161 @@ class UserAPI
                 }
             }
         } else {
-            $this->response(400);
+            new Exceptions(400);
+            //$this->response(400);
         }
     }
 
-    private function createUser()
+    private
+    function createUser()
     {
         if ($_GET['action'] == 'users') {
             //Decodifica un string de JSON
             $obj = json_decode(file_get_contents('php://input'), true);
 
             if (empty((array)$obj)) {
-                $this->response(422, "error", "Nada para añadir, revisa los datos");
+                new Exceptions(422, "error", "Nada para añadir, revisa los datos");
+                //$this->response(422, "error", "Nada para añadir, revisa los datos");
             } else if (
-                isset($obj['identification']) &&
-                isset($obj['firstName']) &&
-                isset($obj['lastName']) &&
-                isset($obj['nickName']) &&
-                isset($obj['email']) &&
-                isset($obj['mobile']) &&
+                isset($obj['id_doc']) &&
+                isset($obj['id_termino']) &&
+                isset($obj['id_estado']) &&
+                isset($obj['id_roles']) &&
+                isset($obj['nombre_completo']) &&
+                isset($obj['nombre']) &&
+                isset($obj['apellido']) &&
+                isset($obj['genero']) &&
+                isset($obj['telefono']) &&
+                isset($obj['correo']) &&
                 isset($obj['password']) &&
-                isset($obj['state']) &&
-                isset($obj['rol']) &&
+                isset($obj['numero_doc']) &&
+                isset($obj['foto_perfil']) &&
+                isset($obj['direccion']) &&
+                isset($obj['latitud']) &&
+                isset($obj['longitud']) &&
+                isset($obj['imagen_pin']) &&
+                isset($obj['pin']) &&
                 isset($obj['token'])
             ) {
                 $response = User::create(
-                    $obj['identification'],
-                    $obj['firstName'],
-                    $obj['lastName'],
-                    $obj['nickName'],
-                    $obj['email'],
-                    $obj['mobile'],
-                    $obj['password'],
-                    $obj['state'],
-                    $obj['rol'],
+                    $obj['id_doc'],
+                    $obj['id_termino'],
+                    $obj['id_estado'],
+                    $obj['id_roles'],
+                    $obj['nombre_completo'],
+                    $obj['nombre'],
+                    $obj['apellido'],
+                    $obj['genero'],
+                    $obj['telefono'],
+                    $obj['correo'],
+                    md5($obj['password']),
+                    $obj['numero_doc'],
+                    ($obj['foto_perfil'] === "") ? null : $obj['foto_perfil'],
+                    ($obj['direccion'] === "") ? null : $obj['direccion'],
+                    ($obj['latitud'] === "") ? null : $obj['latitud'],
+                    ($obj['longitud'] === "") ? null : $obj['longitud'],
+                    ($obj['imagen_pin'] === "") ? null : $obj['imagen_pin'],
+                    ($obj['pin'] === "") ? null : $obj['pin'],
                     $obj['token']
                 );
                 if ($response == -1) {
                     echo json_encode(array(
                         'state' => '2',
-                        'message' => 'Hubo un error al insertar el usuario'
+                        'message' => 'Este usuario ya existe, ve al menú de ingresar!'
                     ), JSON_PRETTY_PRINT);
                 } else {
-                    $userDate = User::getLastUser();
+                    $userData = User::getLastUser();
 
+                    AccessPoint::insertAccessPointsToUserDefault($userData["id"], 1);
+                    AccessPoint::insertAccessPointsToUserDefault($userData["id"], 2);
                     $user["state"] = 1;
-                    $user["user"] = $userDate;
+                    $user["user"] = $userData;
                     echo json_encode($user, JSON_PRETTY_PRINT);
                 }
             } else {
-                $this->response(422, "error", "Alguna propiedad no esta definida o es incorrecta");
+                new Exceptions(422, "error", "Alguna propiedad no esta definida o es incorrecta");
+                //$this->response(422, "error", "Alguna propiedad no esta definida o es incorrecta");
             }
         } else if ($_GET['action'] == 'checkLogin') {
             //Decodifica un string de JSON
             $obj = json_decode(file_get_contents('php://input'), true);
 
             if (empty((array)$obj)) {
-                $this->response(422, "error", "Nada para añadir, revisa los datos");
+                new Exceptions(422, "error", "Nada para añadir, revisa los datos");
+                //$this->response(422, "error", "Nada para añadir, revisa los datos");
             } else if (
-                isset($obj['nickName']) &&
+                isset($obj['mail']) &&
                 isset($obj['password']) &&
                 isset($obj['token'])
             ) {
-                $response = User::checkLogin($obj['nickName'], $obj['password']);
+                $response = User::validateEmail($obj['mail']);
                 if ($response) {
-                    User::setUserToken($response["id"], $obj['token']);
-                    $response = User::getUser($response["id"]);
+                    // Correo correcto
+                    $response = User::checkLogin($obj['mail'], md5($obj['password']));
+                    if ($response) {
+                        User::setUserToken($response["id"], $obj['token']);
+                        $response = User::getUser($response["id"]);
 
+                        $user["state"] = 1;
+
+
+                        $user["user"] = $response;
+                        echo json_encode($user, JSON_PRETTY_PRINT);
+                    } else {
+                        echo json_encode(array(
+                            'state' => '2',
+                            'message' => 'Contraseña incorrecta'
+                        ), JSON_PRETTY_PRINT);
+                    }
+                } else {
+                    // Correo incorrecto
+                    echo json_encode(array(
+                        'state' => '2',
+                        'message' => 'Correo incorrecto'
+                    ), JSON_PRETTY_PRINT);
+                }
+            } else {
+                new Exceptions(422, "error", "Alguna propiedad no esta definida o es incorrecta");
+                //$this->response(422, "error", "Alguna propiedad no esta definida o es incorrecta");
+            }
+        } else if ($_GET['action'] == 'validateUser') {
+            //Decodifica un string de JSON
+            $obj = json_decode(file_get_contents('php://input'), true);
+
+            if (empty((array)$obj)) {
+                new Exceptions(422, "error", "Nada para añadir, revisa los datos");
+                //$this->response(422, "error", "Nada para añadir, revisa los datos");
+            } else if (isset($obj['email'])) {
+                $response = User::validateEmail($obj['email']);
+                if ($response) {
                     $user["state"] = 1;
                     $user["user"] = $response;
                     echo json_encode($user, JSON_PRETTY_PRINT);
                 } else {
                     echo json_encode(array(
                         'state' => '2',
-                        'message' => 'Usuario o Contraseña incorrectos'
+                        'message' => 'Este Usuario aún no existe, registrese por favor!'
+                    ), JSON_PRETTY_PRINT);
+                }
+            } else if (isset($obj['phone'])) {
+                $response = User::validatePhone($obj['phone']);
+                if ($response) {
+                    $user["state"] = 1;
+                    $user["user"] = $response;
+                    echo json_encode($user, JSON_PRETTY_PRINT);
+                } else {
+                    echo json_encode(array(
+                        'state' => '2',
+                        'message' => 'Este Usuario aún no existe, registrese por favor!'
                     ), JSON_PRETTY_PRINT);
                 }
             } else {
-                $this->response(422, "error", "Alguna propiedad no esta definida o es incorrecta");
+                new Exceptions(422, "error", "Alguna propiedad no esta definida o es incorrecta");
+                //$this->response(422, "error", "Alguna propiedad no esta definida o es incorrecta");
             }
         } else {
-            $this->response(400);
+            new Exceptions(400);
+            //$this->response(400);
         }
     }
 
@@ -139,38 +226,53 @@ class UserAPI
                 $obj = json_decode(file_get_contents('php://input'), true);
 
                 if (empty((array)$obj)) {
-                    $this->response(422, "error", "Nada para añadir, revisa los datos");
+                    new Exceptions(422, "error", "Nada para añadir, revisa los datos");
+                    //$this->response(422, "error", "Nada para añadir, revisa los datos");
                 } else if (
-                    isset($obj['identification']) &&
-                    isset($obj['firstName']) &&
-                    isset($obj['lastName']) &&
-                    isset($obj['nickName']) &&
-                    isset($obj['email']) &&
-                    isset($obj['mobile']) &&
+                    isset($obj['id_doc']) &&
+                    isset($obj['id_termino']) &&
+                    isset($obj['id_estado']) &&
+                    isset($obj['id_roles']) &&
+                    isset($obj['nombre_completo']) &&
+                    isset($obj['nombre']) &&
+                    isset($obj['apellido']) &&
+                    isset($obj['genero']) &&
+                    isset($obj['telefono']) &&
+                    isset($obj['correo']) &&
                     isset($obj['password']) &&
-                    isset($obj['state']) &&
-                    isset($obj['rol'])
+                    isset($obj['numero_doc']) &&
+                    isset($obj['foto_perfil']) &&
+                    isset($obj['direccion']) &&
+                    isset($obj['latitud']) &&
+                    isset($obj['longitud']) &&
+                    isset($obj['imagen_pin']) &&
+                    isset($obj['pin'])
                 ) {
                     User::update(
                         $obj['identification'],
                         $obj['firstName'],
                         $obj['lastName'],
+                        $obj['name'],
                         $obj['nickName'],
                         $obj['email'],
                         $obj['mobile'],
                         $obj['password'],
+                        $obj['gender'],
                         $obj['state'],
                         $obj['rol'],
                         $_GET['id']
                     );
-                    $this->response(200, "success", "Usuario actualizado");
+                    new Exceptions(200, "success", "Usuario actualizado");
+                    //$this->response(200, "success", "Usuario actualizado");
                 } else {
-                    $this->response(422, "error", "Alguna propiedad no esta definida o es incorrecta");
+                    new Exceptions(422, "error", "Alguna propiedad no esta definida o es incorrecta");
+                    //$this->response(422, "error", "Alguna propiedad no esta definida o es incorrecta");
                 }
                 exit;
             }
         }
-        $this->response(400);
+        new Exceptions(400);
+        //$this->response(400);
     }
 
     function deleteUser()
@@ -179,22 +281,16 @@ class UserAPI
             if ($_GET['action'] == 'users') {
                 $response = User::delete($_GET['id']);
                 if ((int)$response == -1) {
-                    $this->response(422, "error", "Error al eliminar el Usuario");
+                    new Exceptions(422, "error", "Error al eliminar el Usuario");
+                    //$this->response(422, "error", "Error al eliminar el Usuario");
                     exit;
                 }
-                $this->response(204);
+                new Exceptions(204);
+                //$this->response(204);
                 exit;
             }
         }
-        $this->response(400);
-    }
-
-    private function response($code = 200, $status = "", $message = "")
-    {
-        http_response_code($code);
-        if (!empty($status) && !empty($message)) {
-            $response = array("status" => $status, "message" => $message);
-            echo json_encode($response, JSON_PRETTY_PRINT);
-        }
+        new Exceptions(400);
+        //$this->response(400);
     }
 }
