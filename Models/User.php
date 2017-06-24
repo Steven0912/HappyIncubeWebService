@@ -2,6 +2,8 @@
 
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '../DatabaseConnection/Database.php';
 
+// esto es un comentario
+
 class User
 {
     function __construct()
