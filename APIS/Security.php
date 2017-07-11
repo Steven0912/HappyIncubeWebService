@@ -40,11 +40,11 @@ class Security
             if ($claveApi === $this->generarClaveApi()) {
                 return 10;
             } else {
-                $this->response(422, "error", "Clave de API no autorizada");
+                new Exceptions(422, "error", "Clave de API no autorizada");
             }
 
         } else {
-            $this->response(422, "error", "Se requiere Clave del API para autenticación");
+            new Exceptions(422, "error", "Se requiere Clave del API para autenticación");
         }
     }
 }

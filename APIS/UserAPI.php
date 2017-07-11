@@ -10,12 +10,13 @@ class UserAPI
 {
     public function API()
     {
+
+
         header('Content-Type: application/JSON');
         $method = $_SERVER['REQUEST_METHOD'];
 
         $obj = new Security();
         if ($obj->autorizar() == 10) {
-
             switch ($method) {
                 case 'GET':
                     if ($_GET['action'] == 'users') {

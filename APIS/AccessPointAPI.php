@@ -3,6 +3,7 @@
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '../Models/AccessPoint.php';
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '../APIS/Security.php';
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '../Utils/Exceptions.php';
+error_reporting(0);
 
 class AccessPointAPI
 {
@@ -45,6 +46,7 @@ class AccessPointAPI
             if ($response) {
                 $accesspoints["state"] = 1;
                 $accesspoints["accesspoints"] = $response;
+
                 echo json_encode($accesspoints, JSON_PRETTY_PRINT);
             } else {
                 echo json_encode(array(
